@@ -7,7 +7,8 @@ var path = require('path');
 var res;
 
 archive.initialize({
-  list : path.join(__dirname, "/testdata/sites.txt")
+  list : path.join(__dirname, "/testdata/sites.txt"),
+  archivedSites : path.join(__dirname, '/testdata/sites')
 });
 
 // Conditional async testing, akin to Jasmine's waitsFor()
@@ -65,7 +66,7 @@ describe("Node Server Request Listener Function", function() {
       function(){
         var fileContents = fs.readFileSync(archive.paths.list, 'utf8');
         expect(res._responseCode).to.equal(302);
-        expect(fileContents).to.equal(url + "\n");
+        expect(fileContents).to.equal("\n" + url);
         done();
     });
   });
@@ -99,13 +100,106 @@ describe("html fetcher helpers", function(){
     waitForThen(
       function() { return resultArray; },
       function(){
+        console.log('readListOfUrls result');
         expect(resultArray).to.deep.equal(urlArray);
         done();
     });
   });
 
-  it("should have a 'downloadUrls' function", function(){
-    expect(typeof archive.downloadUrls).to.equal('function');
+  it("should have a 'isUrlInList' function", function(done){
+    var urlArray = ["example1.com", "example2.com"];
+    var resultArray = [];
+
+    fs.writeFileSync(archive.paths.list, urlArray.join("\n"));
+    archive.isUrlInList("example1.com",function(exists){
+      resultArray.push(exists);
+    });
+
+    archive.isUrlInList("example2.com",function(exists){
+      resultArray.push(exists);
+    });
+
+    archive.isUrlInList("example3.com",function(exists){
+      resultArray.push(exists);
+    });
+
+    waitForThen(
+      function() { return resultArray; },
+      function(){
+        console.log('isUrlInList result');
+        expect(resultArray).to.deep.equal([true,true,false]);
+        done();
+    });
+  });
+
+  it("should have a 'addUrlToList' function", function(done){
+    var urlArray = ["example1.com", "example2.com"];
+    var resultArray;
+
+    fs.writeFileSync(archive.paths.list, urlArray.join("\n"));
+    archive.addUrlToList('example3.com',function(success){
+      if (success){
+        archive.readListOfUrls(function(urls){
+          resultArray = urls;
+          urlArray.push('example3.com');
+        });
+      }
+    });
+
+
+    waitForThen(
+      function() { return resultArray; },
+      function(){
+        console.log('addUrlToList result');
+        expect(resultArray).to.deep.equal(urlArray);
+        done();
+    });
+  });
+
+  it("should have a 'isURLArchived' function", function(done){
+    var realWebsite = 'www.google.com';
+    var fakeWebsite = 'www.example.com';
+    var resultArray;
+    var placeholder = [];
+    archive.isURLArchived(realWebsite,function(isURLArchived){
+      placeholder.push(isURLArchived);
+      archive.isURLArchived(fakeWebsite,function(isURLArchived){
+        placeholder.push(isURLArchived);
+        resultArray = placeholder;
+      });
+    });
+    waitForThen(
+      function() {
+        return resultArray;
+      },
+      function() {
+        console.log('isURLArchived result');
+        expect(resultArray).to.deep.equal([true,false]);
+        done();
+      }
+    );
+  });
+
+  it("should have a 'downloadUrls' function", function(done){
+    var fbweb = 'www.facebook.com';
+    var gweb = 'www.google.com';
+    urlArray = [fbweb,gweb];
+    fs.writeFileSync(archive.paths.list, urlArray.join("\n"));
+    var resultObj;
+    archive.downloadUrls(function(url){
+      archive.isURLArchived(url,function(isURLArchived){
+        resultObj = {};
+        resultObj[url] = isURLArchived;
+      });
+    });
+    waitForThen(
+      function() {return resultObj; },
+      function() {
+        console.log('downloadUrls result');
+        expect(resultObj[fbweb]).to.equal(true);
+        done();
+      }
+    );
   });
 
 });
