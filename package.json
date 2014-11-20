@@ -5,6 +5,7 @@
   "author": "Hack Reactor",
   "license": "Copyright 2013, Hack Reactor. All rights reserved.",
   "dependencies": {
+    "cron": "^1.0.5",
     "http-request": "^0.7.0",
     "nodemon": "^1.2.1"
   },

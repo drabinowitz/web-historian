@@ -10,8 +10,16 @@ post.addUrl = function(req,callback){
     url += data;
   });
   req.on('end',function(){
-    archive.addUrlToList(url.substr(4),function(success){
-      callback(success);
+    url = url.substr(4);
+    archive.isURLArchived(url,function(alreadyArchived){
+      if (!alreadyArchived){
+        archive.addUrlToList(url,function(success){
+          callback(!alreadyArchived,url);
+        });
+      } else {
+        callback(!alreadyArchived,url);
+      }
+
     });
   });
 };

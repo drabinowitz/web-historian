@@ -27,6 +27,10 @@ response.redirect = function(res,redirectTo){
   return attachHeaders(res,302,{Location:redirectTo});
 };
 
+response.redirect.send = function(res,redirectTo){
+  return response.send(response.redirect(res,redirectTo));
+};
+
 response.notFound = function(res){
   return attachHeaders(res,404);
 };

@@ -113,18 +113,18 @@ describe("html fetcher helpers", function(){
     fs.writeFileSync(archive.paths.list, urlArray.join("\n"));
     archive.isUrlInList("example1.com",function(exists){
       resultArray.push(exists);
+      archive.isUrlInList("example2.com",function(exists){
+        resultArray.push(exists);
+        archive.isUrlInList("example3.com",function(exists){
+          resultArray.push(exists);
+        });
+      });
     });
 
-    archive.isUrlInList("example2.com",function(exists){
-      resultArray.push(exists);
-    });
 
-    archive.isUrlInList("example3.com",function(exists){
-      resultArray.push(exists);
-    });
 
     waitForThen(
-      function() { return resultArray; },
+      function() { return resultArray.length===3; },
       function(){
         console.log('isUrlInList result');
         expect(resultArray).to.deep.equal([true,true,false]);
@@ -195,7 +195,6 @@ describe("html fetcher helpers", function(){
     waitForThen(
       function() {return resultObj; },
       function() {
-        console.log('downloadUrls result');
         expect(resultObj[fbweb]).to.equal(true);
         done();
       }
