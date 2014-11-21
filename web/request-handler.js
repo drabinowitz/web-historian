@@ -7,7 +7,8 @@ var loading = require('./loading-handler');
 //router object
 var router = {
   '/':root.handleRequest,
-  '/loading':loading.handleRequest
+  '/loading':loading.handleRequest,
+  '/styles.css':root.sendCss
 };
 
 exports.handleRequest = function (req, res) {

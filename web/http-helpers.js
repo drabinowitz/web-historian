@@ -40,6 +40,12 @@ http.serveLoading = function(res){
   });
 };
 
+http.serveCss = function(res){
+  serveAssets(response.success(res),archive.paths.css,function(data){
+    response.send(res,data);
+  });
+};
+
 // serve archived page if it exists
 http.serveArchived = function(res,uri){
   serveAssets(response.success(res),path.join(archive.paths.archivedSites,uri),function(data){

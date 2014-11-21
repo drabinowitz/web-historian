@@ -22,4 +22,10 @@ root.handleRequest = function(req,res){
 
 };
 
+root.sendCss = function(req,res){
+  if (req.method === 'GET'){
+    http.serveCss(res);
+  }
+};
+
 _(exports).extend(root);

@@ -3,7 +3,6 @@ var path = require('path');
 var _ = require('underscore');
 var http = require('./http-helpers');
 var response = require('../helpers/response-helpers');
-var loading = require('./loading-handler');
 var archive = require('../helpers/archive-helpers');
 
 var archiveHandler = {};
@@ -22,7 +21,7 @@ archiveHandler.handleRequest = function(req,res){
       } else {
         archive.isUrlInList(uri,function(listed){
           if (listed){
-            loading.handleRequest(req,res);
+            response.redirect.send(res,'/loading');
           } else {
             response.notFound.send(res);
           }
